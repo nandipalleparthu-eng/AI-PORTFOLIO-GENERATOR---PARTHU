@@ -1,0 +1,117 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Connection testing exception
+    match /test/{testDocId} {
+      allow read: if true;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function getRequestUid() {
+      return request.auth != null ? request.auth.uid : "simulated-dev-123";
+    }
+
+    function isOwnUser(userId) {
+      return (request.auth != null && request.auth.uid == userId) || userId == "simulated-dev-123";
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Entity validation helpers
+    function isValidUser(data, userId) {
+      return data.uid == userId
+        && data.email is string && data.email.size() <= 200
+        && (data.displayName == null || (data.displayName is string && data.displayName.size() <= 200))
+        && (data.photoURL == null || (data.photoURL is string && data.photoURL.size() <= 500))
+        && (data.githubUsername == null || (data.githubUsername is string && data.githubUsername.size() <= 100))
+        && (data.bio == null || (data.bio is string && data.bio.size() <= 1000))
+        && (data.onboardingState == null || (data.onboardingState is string && data.onboardingState.size() <= 100))
+        && (data.createdAt == null || (data.createdAt is string && data.createdAt.size() <= 100));
+    }
+
+    function isValidPortfolio(data) {
+      return data.id is string && data.id.size() <= 128
+        && data.userId == getRequestUid()
+        && data.title is string && data.title.size() <= 200
+        && (data.tagline == null || (data.tagline is string && data.tagline.size() <= 500))
+        && (data.style == null || (data.style is string && data.style.size() <= 100))
+        && (data.repoName == null || (data.repoName is string && data.repoName.size() <= 100))
+        && (data.liveUrl == null || (data.liveUrl is string && data.liveUrl.size() <= 500))
+        && (data.deployedPlatform == null || (data.deployedPlatform is string && data.deployedPlatform.size() <= 100))
+        && (data.deploymentStatus == null || (data.deploymentStatus is string && data.deploymentStatus.size() <= 100))
+        && (data.updatedAt == null || (data.updatedAt is string && data.updatedAt.size() <= 100));
+    }
+
+    function isValidChat(data) {
+      return data.id is string && data.id.size() <= 128
+        && data.userId == getRequestUid()
+        && data.messages is list && data.messages.size() <= 1000;
+    }
+
+    // To follow standard schema constraints, suggestion must be authentic
+    function isValidSuggestion(data) {
+      return data.id is string && data.id.size() <= 128
+        && data.userId is string && data.userId.size() <= 128
+        && data.title is string && data.title.size() <= 200;
+    }
+
+    // Matches
+    match /users/{userId} {
+      allow create: if isOwnUser(userId) && isValidUser(incoming(), userId);
+      allow get: if (request.auth != null && (request.auth.uid == userId || isSignedIn())) || userId == "simulated-dev-123";
+      allow list: if false; // Users are never listed in the UI
+      allow update: if isOwnUser(userId) && isValidUser(incoming(), userId);
+      allow delete: if isOwnUser(userId);
+    }
+
+    match /portfolios/{portfolioId} {
+      allow create: if (isSignedIn() || incoming().userId == "simulated-dev-123") && isValidId(portfolioId) && isValidPortfolio(incoming());
+      allow get: if true; // Portfolios are public and shareable
+      allow list: if (request.auth != null && resource.data.userId == request.auth.uid) || resource.data.userId == "simulated-dev-123";
+      allow update: if (isSignedIn() || incoming().userId == "simulated-dev-123") && isValidId(portfolioId) && isValidPortfolio(incoming())
+        && existing().userId == (request.auth != null ? request.auth.uid : "simulated-dev-123")
+        && incoming().userId == existing().userId;
+      allow delete: if (isSignedIn() || existing().userId == "simulated-dev-123") && isValidId(portfolioId) && existing().userId == (request.auth != null ? request.auth.uid : "simulated-dev-123");
+    }
+
+    match /chats/{chatId} {
+      allow create: if (isSignedIn() || chatId == "simulated-dev-123") && isValidId(chatId) && isValidChat(incoming());
+      allow get: if (request.auth != null && chatId == request.auth.uid) || chatId == "simulated-dev-123";
+      allow list: if false;
+      allow update: if (isSignedIn() || chatId == "simulated-dev-123") && isValidId(chatId) && isValidChat(incoming())
+        && existing().userId == (request.auth != null ? request.auth.uid : "simulated-dev-123")
+        && incoming().userId == existing().userId;
+      allow delete: if (isSignedIn() || chatId == "simulated-dev-123") && isValidId(chatId) && existing().userId == (request.auth != null ? request.auth.uid : "simulated-dev-123");
+    }
+
+    match /suggestions/{suggestionId} {
+      allow create: if (isSignedIn() || incoming().userId == "simulated-dev-123") && isValidId(suggestionId) && isValidSuggestion(incoming());
+      allow get: if (request.auth != null && existing().userId == request.auth.uid) || existing().userId == "simulated-dev-123";
+      allow list: if (request.auth != null && resource.data.userId == request.auth.uid) || resource.data.userId == "simulated-dev-123";
+      allow update: if (isSignedIn() || incoming().userId == "simulated-dev-123") && isValidId(suggestionId) && isValidSuggestion(incoming())
+        && existing().userId == (request.auth != null ? request.auth.uid : "simulated-dev-123")
+        && incoming().userId == existing().userId;
+      allow delete: if (isSignedIn() || existing().userId == "simulated-dev-123") && isValidId(suggestionId) && existing().userId == (request.auth != null ? request.auth.uid : "simulated-dev-123");
+    }
+  }
+}

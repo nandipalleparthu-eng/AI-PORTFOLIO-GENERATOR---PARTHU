@@ -1,0 +1,89 @@
+{
+  "entities": {
+    "user": {
+      "title": "User",
+      "description": "User profile information containing details compiled from on-boarded social platforms and design preferences",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Unique identifier of the user" },
+        "email": { "type": "string", "description": "Email address" },
+        "displayName": { "type": "string", "description": "The human name of the user" },
+        "photoURL": { "type": "string", "description": "User profile avatar photo url" },
+        "githubUsername": { "type": "string", "description": "Optional GitHub username connected" },
+        "linkedinHeadline": { "type": "string", "description": "LinkedIn professional headline" },
+        "bio": { "type": "string", "description": "Brief professional bio summary" },
+        "skills": { "type": "string", "description": "Comma separated skills list" },
+        "experience": { "type": "string", "description": "Professional years of experience description" },
+        "onboardingState": { "type": "string", "description": "Current state of onboarding progress" },
+        "preferences": { "type": "object", "description": "Dynamic design and brand aesthetic choices" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Account discovery timestamp" }
+      },
+      "required": ["uid", "email"]
+    },
+    "portfolio": {
+      "title": "Portfolio",
+      "description": "The AI generated developer portfolio configuration containing computed layout and source content",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier of the portfolio" },
+        "userId": { "type": "string", "description": "References user uid" },
+        "title": { "type": "string", "description": "Portfolio website banner title" },
+        "tagline": { "type": "string", "description": "Inspiring professional tagline" },
+        "style": { "type": "string", "description": "Branding style (e.g. Modern Startup, Developer, Luxury, AI Futuristic)" },
+        "themeColors": { "type": "object", "description": "Selected color tokens matching style" },
+        "sections": { "type": "object", "description": "All portfolio sections: Hero, About, Skills, Experience, Projects, Certifications, Contact" },
+        "repoName": { "type": "string", "description": "GitHub repository name generated" },
+        "liveUrl": { "type": "string", "description": "Deployed URL on simulated provider" },
+        "deployedPlatform": { "type": "string", "description": "Deploy platform provider (e.g., Vercel, GitHub Pages)" },
+        "deploymentStatus": { "type": "string", "description": "State of building (completed, deploying, etc.)" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Last rebuild time" }
+      },
+      "required": ["id", "userId", "title"]
+    },
+    "chat": {
+      "title": "Chat",
+      "description": "Multi-turn assistant conversation history holding system feedback",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique chat id" },
+        "userId": { "type": "string", "description": "References user uid" },
+        "messages": { "type": "array", "description": "Array of messages containing role and content" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Last message timestamp" }
+      },
+      "required": ["id", "userId"]
+    },
+    "suggestion": {
+      "title": "Suggestion",
+      "description": "AI-suggested improvements generated weekly or dynamically for the user portfolio",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique suggestion ID" },
+        "userId": { "type": "string", "description": "References user uid" },
+        "title": { "type": "string", "description": "Quick suggestion headline" },
+        "description": { "type": "string", "description": "Detailed prompt explaining optimization benefits" },
+        "type": { "type": "string", "description": "Improvement domain (eco, content, layout)" },
+        "applied": { "type": "boolean", "description": "Is this recommendation applied to code" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp of creation" }
+      },
+      "required": ["id", "userId", "title"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "user",
+      "description": "Master user profile data document keyed by Firestore auth uid"
+    },
+    "/portfolios/{portfolioId}": {
+      "schema": "portfolio",
+      "description": "The live active portfolio or revisions compiled by the generator"
+    },
+    "/chats/{chatId}": {
+      "schema": "chat",
+      "description": "Active conversational update channels between developer and AI"
+    },
+    "/suggestions/{suggestionId}": {
+      "schema": "suggestion",
+      "description": "Weekly AI recommended performance upgrades"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "AI Portfolio Generator",
+  "description": "Create, host, and optimize developer, creative, and executive portfolios in minutes with Google Gemini, Firestore, and seamless GitHub and LinkedIn simulations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
