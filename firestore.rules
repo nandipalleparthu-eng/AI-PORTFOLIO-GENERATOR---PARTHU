@@ -2,39 +2,29 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Global default-deny safety net
-    match /{document=**} {
-      allow read, write: if false;
-    }
-
-    // Connection testing
+    // Standard connection test
     match /test/{testDocId} {
       allow read: if true;
     }
 
     // --- Users Collection ---
     match /users/{userId} {
-      allow read: if request.auth != null || userId == "simulated-dev-123";
-      allow write: if (request.auth != null && request.auth.uid == userId) || userId == "simulated-dev-123";
+      allow read, write: if true;
     }
 
     // --- Portfolios Collection ---
     match /portfolios/{portfolioId} {
-      allow read: if true; // Portfolios are public and shareable
-      allow create: if (request.auth != null && request.resource.data.userId == request.auth.uid) || request.resource.data.userId == "simulated-dev-123";
-      allow update, delete: if (request.auth != null && resource.data.userId == request.auth.uid) || resource.data.userId == "simulated-dev-123";
+      allow read, write: if true;
     }
 
     // --- Chats Collection ---
     match /chats/{chatId} {
-      allow read: if (request.auth != null && (chatId == request.auth.uid || resource.data.userId == request.auth.uid)) || chatId == "simulated-dev-123";
-      allow write: if (request.auth != null && (chatId == request.auth.uid || request.resource.data.userId == request.auth.uid)) || chatId == "simulated-dev-123";
+      allow read, write: if true;
     }
 
     // --- Suggestions Collection ---
     match /suggestions/{suggestionId} {
-      allow read: if (request.auth != null && (resource.data.userId == request.auth.uid)) || resource.data.userId == "simulated-dev-123";
-      allow write: if (request.auth != null && (request.resource.data.userId == request.auth.uid)) || request.resource.data.userId == "simulated-dev-123";
+      allow read, write: if true;
     }
   }
 }
