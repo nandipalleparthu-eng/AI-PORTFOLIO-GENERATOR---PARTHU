@@ -101,3 +101,69 @@ export const frontendStack = {
   styling:    ["TailwindCSS", "Vanilla CSS"],
   motion:     ["Framer Motion", "Three.js"]
 };
+
+
+
+Implementation Plan - Parthu Labs AI Portfolio Generator
+Build the Parthu Labs AI Portfolio Generator platform in the workspace. It will be a premium, responsive full-stack web application developed using Next.js (App Router), React, TypeScript, and TailwindCSS, featuring rich animations (Framer Motion) and iconography (Lucide React).
+
+User Review Required
+IMPORTANT
+
+API Integrations & Mocking Strategy Since fully functional GitHub repo creation and Vercel/Netlify programmatic deployment require secure OAuth tokens and backend orchestration (e.g., GitHub Webhooks, Vercel Deploy Hooks), the platform will implement:
+
+High-Fidelity Mock Orchestrator: A step-by-step visual generation sandbox that realistically demonstrates authentic repository creation, code committing, and Vercel deployment.
+Real-time Live Preview: A dynamic responsive iframe/viewport mockup that renders the generated portfolio instantly. It will be fully functional, updating on-the-fly in response to natural language commands.
+Configurable APIs: Placeholders and structures to connect to real Gemini API, GitHub API, and Vercel API if API keys/tokens are provided later.
+TIP
+
+Aesthetic Theme Alignment The platform will be themed under the Obsidian Cyber brand style (deep dark modes, neon highlights, glassmorphic cards) to match the premium, futuristic tech stack aesthetics of Parthu Labs.
+
+Open Questions
+GitHub integration depth: Do you want us to set up real GitHub Auth via NextAuth / GitHub OAuth apps, or is a simulated high-fidelity connection screen with local storage storage preferred for local testing?
+OpenAI / Gemini integrations: Should we hook up the live portfolio customization chat to a local Next.js serverless route with your Gemini API key (from environment variables), or use a smart client-side logic engine for the demo?
+Proposed Changes
+We will bootstrap a Next.js App Router project in the root directory:
+
+Core Platform Architecture
+[NEW] 
+package.json
+Contains all required dependencies:
+
+Core: react, react-dom, next
+Styles: tailwindcss, postcss, autoprefixer
+Animations: framer-motion
+Icons & UI: lucide-react, clsx, tailwind-merge
+[NEW] 
+src/app/page.tsx
+The landing page of Parthu Labs. High-end hero section, interactive features list, and call-to-action to launch the portfolio generator wizard.
+
+[NEW] 
+src/app/generator/page.tsx
+The Onboarding & Generation wizard. Implements:
+
+Authentic conversational wizard requesting missing details (favorite colors, website styles, resume toggles, custom projects).
+Generation screen displaying step-by-step animations (Content generation, repository setup, codebase generation, Vercel build stages, and deploying).
+[NEW] 
+src/app/dashboard/page.tsx
+The master dashboard for portfolio management:
+
+Live Preview Panel: Shows a live rendering of the custom portfolio (responsive viewports for Desktop, Tablet, and Mobile).
+Natural Language Customizer: A chat pane enabling edits such as "Add my new project: Weather App in React" or "Make the theme dark mode purple".
+AI Upgrades: Weekly suggested improvements (SEO, layouts, structural tweaks) with instant "Apply Changes" options.
+ATS Resume/Cover Letter Builder: PDF-generation controls and cover letter layout tools.
+[NEW] 
+src/components/PortfolioRenderer.tsx
+The dynamic rendering component representing the generated portfolio. It reads a dynamic configuration state (containing bio, skills, color tokens, and layout styles) and applies the corresponding templates:
+
+Modern Startup (Stripe/Vercel style)
+Developer Portfolio (GitHub/Raycast style)
+AI Futuristic (OpenAI/Nvidia style)
+Verification Plan
+Automated Tests
+Build verification: Run npm run build to confirm TypeScript compile checks pass.
+Development startup: Run npm run dev to verify localhost startup.
+Manual Verification
+Walk through the login flow, conversational form, and generation pipeline.
+Verify the portfolio rendering engine correctly switches themes (Obsidian, Quantum, Glassmorphic Aurora) and layouts.
+Verify the chat system successfully updates the portfolio configuration state.
